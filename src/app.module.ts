@@ -8,17 +8,8 @@ import { PropostaModule } from './proposta/proposta.module';
 
 @Module({
     imports: [
+        TypeOrmModule.forRoot(),
         UsuarioModule,
-        TypeOrmModule.forRoot({
-            type: 'postgres',
-            host: 'localhost',
-            port: 15432,
-            username: 'postgres',
-            password: 'admin',
-            database: 'postgres',
-            autoLoadEntities: true,
-            synchronize: true,
-        }),
         CargaModule,
         PropostaModule,
     ],
