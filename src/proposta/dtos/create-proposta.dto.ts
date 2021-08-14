@@ -1,10 +1,9 @@
+import { Carga } from '../entity/carga.entity';
+
 export class CreatePropostaDto {
-    // public data_inicio: Date;
-    // public data_fim: Date;
-    // // public contratado: boolean;
-    // public fonte_energia: string;
-    // public sub_mercado: string;
-    // public valor_proposta: string;
-    // public user: string;
-    // //   public cargas: string[]
+    data_inicio: Date;
+    data_fim: Date;
+    sub_mercado: string;
+    fonte_energia: string;
+    carga: Carga[];
 }

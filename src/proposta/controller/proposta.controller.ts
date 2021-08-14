@@ -9,10 +9,8 @@ import {
 import { Param } from '@nestjs/common';
 import { Controller, Get, Post } from '@nestjs/common';
 import { Guid } from 'guid-typescript';
-import { IController } from 'src/shared/controller.interface';
 import { CreatePropostaDto } from '../dtos/create-proposta.dto';
 import { UpdatePropostaDto } from '../dtos/update-proposta.dto';
-import { Proposta } from '../entity/proposta.entity';
 import { PropostaService } from '../service/proposta.service';
 
 @Controller('proposta')
@@ -30,25 +28,20 @@ export class PropostaController {
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.service.findOne(+id);
+    findOne(@Param('id') id: Guid) {
+        return this.service.findOne(id);
     }
 
     @Patch(':id')
     update(
-        @Param('id') id: string,
+        @Param('id') id: Guid,
         @Body() updatePropostaDto: UpdatePropostaDto,
     ) {
         return this.service.update(id, updatePropostaDto);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.service.remove(+id);
+    remove(@Param('id') id: Guid) {
+        return this.service.remove(id);
     }
-
-    // @Post()
-    // calculate() {
-    //     //TODO
-    // }
 }

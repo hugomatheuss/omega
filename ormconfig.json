@@ -4,7 +4,11 @@
     "port": 15432,
     "username": "postgres",
     "password": "admin",
-    "database": "postgres",
+    "database": "OmegaDB",
     "entities": ["dist/**/*.entity{.ts,.js}"],
-    "synchronize": true
+    "migrations": ["database/migrations//*.ts"],
+    "synchronize": true,
+    "cli": {
+        "migrationsDir": "database/migrations"
+    }
 }
