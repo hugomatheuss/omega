@@ -1,19 +1,17 @@
-import {
-    BadRequestException,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Guid } from 'guid-typescript';
-import { Repository } from 'typeorm';
+import { createQueryBuilder, Repository } from 'typeorm';
 import { CreatePropostaDto } from '../dtos/create-proposta.dto';
 import { UpdatePropostaDto } from '../dtos/update-proposta.dto';
 import { Carga } from '../entity/carga.entity';
 import { Proposta } from '../entity/proposta.entity';
+import { CargaSevice } from './carga.service';
 
 @Injectable()
 export class PropostaService {
     constructor(
+        private readonly cargaService: CargaSevice,
         @InjectRepository(Proposta)
         private readonly propostaRepository: Repository<Proposta>,
         @InjectRepository(Carga)
@@ -23,24 +21,16 @@ export class PropostaService {
     readonly kw_value = 10;
 
     async create(dto: CreatePropostaDto) {
-        console.log(dto.carga);
-
-        const consumoTotal = dto.carga
-            .map((carga) => carga.consumo)
-            .reduce((p, c) => {
-                return p + c;
-            });
+        const consumoTotal = this.cargaService.consumoTotal(dto.carga);
 
         const valorTotal = this.calculate(
             dto.sub_mercado,
             dto.fonte_energia,
             consumoTotal,
         );
-        const cargas = dto.carga.map((c) => {
-            return new Carga(c.nome, c.consumo);
-        });
 
-        await this.cargaRepository.save(cargas);
+        const cargas = await this.cargaService.create(dto.carga);
+
         const proposta = new Proposta(
             dto.data_inicio,
             dto.data_fim,
@@ -49,8 +39,6 @@ export class PropostaService {
             valorTotal,
             cargas,
         );
-        console.log(proposta);
-
         // salvo o objeto criado
         return this.propostaRepository.save(proposta);
     }
@@ -59,15 +47,25 @@ export class PropostaService {
         return this.propostaRepository.find();
     }
 
-    findOne(id: Guid) {
+    async findOne(id: Guid) {
         const proposta = this.propostaRepository.findOne(id.toString());
+
+        const cargas = await createQueryBuilder('proposta')
+            .leftJoinAndSelect('proposta.carga', 'carga')
+            .where('proposta.id_public = :id_public', {
+                id_public: id.toString(),
+            });
+
+        console.log(cargas);
+        console.log(proposta);
         return proposta;
     }
 
     async update(id: Guid, updatePropostaDto: UpdatePropostaDto) {
+        this.cargaService.update(updatePropostaDto.carga);
         const proposta = await this.propostaRepository.preload({
             id_public: id.toString(),
-            ...updatePropostaDto,
+            // ...updatePropostaDto,
         });
 
         if (!proposta) {

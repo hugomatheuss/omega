@@ -1,13 +1,21 @@
 import { Guid } from 'guid-typescript';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    Generated,
+    ManyToOne,
+    PrimaryColumn,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Proposta } from './proposta.entity';
 
-@Entity({ name: 'TB_CARGA' })
+@Entity({ name: 'cargas' })
 export class Carga {
-    @PrimaryGeneratedColumn({ type: 'int' })
-    public id: number;
+    @Column({ type: 'int' })
+    @Generated('increment')
+    id: number;
 
-    @Column({ type: 'varchar' })
+    @PrimaryColumn({ type: 'varchar' })
     public id_public: string;
 
     @Column({ type: 'varchar', name: 'company_name' })
@@ -16,7 +24,9 @@ export class Carga {
     @Column({ type: 'numeric', name: 'kw_consume' })
     public consumo: number;
 
-    @ManyToOne(() => Proposta, (proposta) => proposta.carga)
+    @ManyToOne(() => Proposta, (proposta) => proposta.carga, {
+        onDelete: 'CASCADE',
+    })
     public proposta: Proposta;
 
     constructor(nome: string, consumo: number) {

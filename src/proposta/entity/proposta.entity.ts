@@ -7,15 +7,18 @@ import {
     OneToMany,
     JoinTable,
     PrimaryGeneratedColumn,
+    PrimaryColumn,
+    Generated,
 } from 'typeorm';
 import { Carga } from './carga.entity';
 
-@Entity({ name: 'proposta' })
+@Entity({ name: 'propostas' })
 export class Proposta {
-    @PrimaryGeneratedColumn({ type: 'int' })
-    public id: number;
+    @Column({ type: 'int' })
+    @Generated('increment')
+    id: number;
 
-    @Column({ type: 'varchar' })
+    @PrimaryColumn({ type: 'varchar' })
     public id_public: string;
 
     @Column({ type: 'date' })
@@ -39,8 +42,10 @@ export class Proposta {
     // @ManyToOne(() => Usuario, (usuario) => usuario.propostas)
     // usuario: Usuario;
 
-    @OneToMany((type) => Carga, (carga) => carga.proposta)
-    // @JoinTable()
+    @OneToMany((type) => Carga, (carga) => carga.proposta, {
+        onDelete: 'CASCADE',
+    })
+    @JoinTable()
     carga: Carga[];
 
     constructor(
