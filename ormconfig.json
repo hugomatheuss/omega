@@ -6,5 +6,9 @@
     "password": "admin",
     "database": "postgres",
     "entities": ["dist/**/*.entity{.ts,.js}"],
-    "synchronize": true
+    "migrations": ["database/migrations//*.ts"],
+    "synchronize": true,
+    "cli": {
+        "migrationsDir": "database/migrations"
+    }
 }
