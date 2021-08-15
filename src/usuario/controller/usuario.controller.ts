@@ -14,6 +14,7 @@ import { CreateUsuarioDto } from '../dto/create-usuario.dto';
 import { UpdateUsuarioDto } from '../dto/update-usuario.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from 'src/auth/auth.service';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('usuario')
 export class UsuarioController {
@@ -27,6 +28,7 @@ export class UsuarioController {
     return this.usuarioService.create(createUsuarioDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.usuarioService.findAll();
@@ -34,14 +36,16 @@ export class UsuarioController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usuarioService.findOne(id);
+    return this.usuarioService.findOne(id);///bugzinho
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
     return this.usuarioService.update(+id, updateUsuarioDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usuarioService.remove(+id);
