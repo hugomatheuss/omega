@@ -9,6 +9,7 @@ import {
     PrimaryGeneratedColumn,
     PrimaryColumn,
     Generated,
+    JoinColumn,
 } from 'typeorm';
 import { Carga } from './carga.entity';
 
@@ -30,10 +31,10 @@ export class Proposta {
     @Column({ type: 'boolean', default: false })
     public contratado;
 
-    @Column({ type: 'varchar', length: 12 })
+    @Column({ type: 'varchar', length: 24 })
     public fonte_energia: string;
 
-    @Column({ type: 'varchar', length: 8 })
+    @Column({ type: 'varchar', length: 24 })
     public sub_mercado: string;
 
     @Column({ type: 'numeric' })
@@ -43,9 +44,10 @@ export class Proposta {
     // usuario: Usuario;
 
     @OneToMany((type) => Carga, (carga) => carga.proposta, {
+        eager: true,
         onDelete: 'CASCADE',
     })
-    @JoinTable()
+    @JoinTable({})
     carga: Carga[];
 
     constructor(

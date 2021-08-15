@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Guid } from 'guid-typescript';
+import { type } from 'node:os';
 import { createQueryBuilder, Repository } from 'typeorm';
 import { CreatePropostaDto } from '../dtos/create-proposta.dto';
 import { UpdatePropostaDto } from '../dtos/update-proposta.dto';
@@ -18,14 +19,12 @@ export class PropostaService {
         private readonly cargaRepository: Repository<Carga>,
     ) {}
 
-    readonly kw_value = 10;
-
     async create(dto: CreatePropostaDto) {
         const consumoTotal = this.cargaService.consumoTotal(dto.carga);
 
         const valorTotal = this.calculate(
-            dto.sub_mercado,
             dto.fonte_energia,
+            dto.sub_mercado,
             consumoTotal,
         );
 
@@ -50,22 +49,27 @@ export class PropostaService {
     async findOne(id: Guid) {
         const proposta = this.propostaRepository.findOne(id.toString());
 
-        const cargas = await createQueryBuilder('proposta')
-            .leftJoinAndSelect('proposta.carga', 'carga')
-            .where('proposta.id_public = :id_public', {
-                id_public: id.toString(),
-            });
-
-        console.log(cargas);
-        console.log(proposta);
         return proposta;
     }
 
     async update(id: Guid, updatePropostaDto: UpdatePropostaDto) {
-        this.cargaService.update(updatePropostaDto.carga);
+        const cargas = updatePropostaDto.carga;
+
+        await this.cargaService.update(cargas, id.toString());
+
+        const consumoTotal = this.cargaService.consumoTotal(cargas);
+
+        const valotTotal = this.calculate(
+            updatePropostaDto.fonte_energia,
+            updatePropostaDto.sub_mercado,
+            consumoTotal,
+        );
+
+        updatePropostaDto.valor_proposta = valotTotal;
+
         const proposta = await this.propostaRepository.preload({
             id_public: id.toString(),
-            // ...updatePropostaDto,
+            ...updatePropostaDto,
         });
 
         if (!proposta) {
@@ -82,13 +86,39 @@ export class PropostaService {
         }
         return this.propostaRepository.remove(proposta);
     }
+    async removeCarga(idProposta: Guid, idCarga: Guid) {
+        const cargas = await this.cargaService.remove(idProposta, idCarga);
+        const consumoTotal = await this.cargaService.consumoTotal(cargas);
+        let oldProposta = await this.propostaRepository.findOne(
+            idProposta.toString(),
+        );
+        console.log(oldProposta);
+        const valorTotal = await this.calculate(
+            oldProposta.fonte_energia,
+            oldProposta.sub_mercado,
+            consumoTotal,
+        );
+        const newProposta = new UpdatePropostaDto(
+            oldProposta.data_inicio,
+            oldProposta.data_fim,
+            oldProposta.fonte_energia,
+            oldProposta.sub_mercado,
+            valorTotal,
+            cargas,
+        );
+        const proposta = await this.propostaRepository.preload({
+            id_public: idProposta.toString(),
+            ...newProposta,
+        });
+        this.propostaRepository.save(proposta);
+    }
 
-    calculate(sub_market: string, font: string, total_consume: number) {
+    calculate(font: string, sub_market: string, total_consume: number) {
         let sub_market_value: number;
         let font_value: number;
         let total_value: number;
-
-        switch (sub_market.toUpperCase()) {
+        console.log(sub_market);
+        switch (sub_market) {
             case 'NORTE': {
                 sub_market_value = 2;
                 break;
@@ -108,10 +138,10 @@ export class PropostaService {
         }
 
         font_value = font == 'CONVENCIONAL' ? 5 : -2;
+        console.log(total_consume, sub_market_value, font_value);
 
-        total_value =
-            total_consume * this.kw_value + (sub_market_value + font_value);
-
+        total_value = total_consume * 10 + (sub_market_value + font_value);
+        console.log(total_value);
         return total_value;
     }
 }

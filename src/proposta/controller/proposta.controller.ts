@@ -44,4 +44,11 @@ export class PropostaController {
     remove(@Param('id') id: Guid) {
         return this.service.remove(id);
     }
+    @Delete('/:id/:idCarga')
+    removeCarga(
+        @Param('id') idProposta: Guid,
+        @Param('idCarga') idCarga: Guid,
+    ) {
+        return this.service.removeCarga(idProposta, idCarga);
+    }
 }

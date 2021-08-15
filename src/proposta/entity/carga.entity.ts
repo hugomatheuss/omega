@@ -3,6 +3,7 @@ import {
     Column,
     Entity,
     Generated,
+    JoinColumn,
     ManyToOne,
     PrimaryColumn,
     PrimaryGeneratedColumn,
@@ -27,6 +28,7 @@ export class Carga {
     @ManyToOne(() => Proposta, (proposta) => proposta.carga, {
         onDelete: 'CASCADE',
     })
+    @JoinColumn({ name: 'proposta_id' })
     public proposta: Proposta;
 
     constructor(nome: string, consumo: number) {
