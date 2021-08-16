@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Guid } from 'guid-typescript';
-import { createQueryBuilder, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreatePropostaDto } from '../dtos/create-proposta.dto';
 import { UpdatePropostaDto } from '../dtos/update-proposta.dto';
 import { Carga } from '../entity/carga.entity';
@@ -18,14 +18,12 @@ export class PropostaService {
         private readonly cargaRepository: Repository<Carga>,
     ) {}
 
-    readonly kw_value = 10;
-
     async create(dto: CreatePropostaDto) {
         const consumoTotal = this.cargaService.consumoTotal(dto.carga);
 
         const valorTotal = this.calculate(
-            dto.sub_mercado,
             dto.fonte_energia,
+            dto.sub_mercado,
             consumoTotal,
         );
 
@@ -39,79 +37,109 @@ export class PropostaService {
             valorTotal,
             cargas,
         );
-        // salvo o objeto criado
-        return this.propostaRepository.save(proposta);
+        // salvo o objeto criado 
+        return this.propostaRepository.save(proposta)
     }
 
-    findAll() {
+    findAll(): Promise<Proposta[]> {
         return this.propostaRepository.find();
     }
 
     async findOne(id: Guid) {
         const proposta = this.propostaRepository.findOne(id.toString());
 
-        const cargas = await createQueryBuilder('proposta')
-            .leftJoinAndSelect('proposta.carga', 'carga')
-            .where('proposta.id_public = :id_public', {
-                id_public: id.toString(),
-            });
-
-        console.log(cargas);
-        console.log(proposta);
         return proposta;
     }
 
     async update(id: Guid, updatePropostaDto: UpdatePropostaDto) {
-        this.cargaService.update(updatePropostaDto.carga);
+        const cargas = updatePropostaDto.carga;
+
+        await this.cargaService.update(cargas, id.toString());
+
+        const consumoTotal = this.cargaService.consumoTotal(cargas);
+
+        const valorTotal = this.calculate(
+            updatePropostaDto.fonte_energia,
+            updatePropostaDto.sub_mercado,
+            consumoTotal,
+        );
+
+        updatePropostaDto.valor_proposta = valorTotal;
+
         const proposta = await this.propostaRepository.preload({
             id_public: id.toString(),
-            // ...updatePropostaDto,
+            ...updatePropostaDto,
         });
 
         if (!proposta) {
             throw new NotFoundException(`proposta ID ${id} not found`);
         }
+
         return this.propostaRepository.save(proposta);
     }
 
-    async remove(id: Guid) {
+    async remove(id: Guid): Promise<any> {
         const proposta = await this.propostaRepository.findOne(id.toString());
 
         if (!proposta) {
             throw new NotFoundException(`proposta ID ${id} not found`);
         }
-        return this.propostaRepository.remove(proposta);
+        return this.propostaRepository.delete(proposta);
     }
 
-    calculate(sub_market: string, font: string, total_consume: number) {
-        let sub_market_value: number;
-        let font_value: number;
-        let total_value: number;
+    async removeCarga(idProposta: Guid, idCarga: Guid) {
+        const cargas = await this.cargaService.remove(idProposta, idCarga);
+        const consumoTotal = await this.cargaService.consumoTotal(cargas);
+        let oldProposta = await this.propostaRepository.findOne(
+            idProposta.toString(),
+        );
+        console.log(oldProposta);
+        const valorTotal = await this.calculate(
+            oldProposta.fonte_energia,
+            oldProposta.sub_mercado,
+            consumoTotal,
+        );
+        const newProposta = new UpdatePropostaDto(
+            oldProposta.data_inicio,
+            oldProposta.data_fim,
+            oldProposta.fonte_energia,
+            oldProposta.sub_mercado,
+            valorTotal,
+            cargas,
+        );
+        const proposta = await this.propostaRepository.preload({
+            id_public: idProposta.toString(),
+            ...newProposta,
+        });
+        this.propostaRepository.save(proposta);
+    }
 
-        switch (sub_market.toUpperCase()) {
-            case 'NORTE': {
-                sub_market_value = 2;
+    calculate(fonte: string, sub_mercado: string, consumo_total: number) {
+        let valor_sub_mercado: number;
+        let valor_fonte: number;
+        let valor_total: number;
+
+        switch (sub_mercado.toUpperCase()) {
+            case "NORTE": {
+                valor_sub_mercado = 2;
                 break;
             }
-            case 'NORDESTE': {
-                sub_market_value = -1;
+            case "NORDESTE": {
+                valor_sub_mercado = -1;
                 break;
             }
-            case 'SUL': {
-                sub_market_value = 3.5;
+            case "SUL": {
+                valor_sub_mercado = 3.5;
                 break;
             }
-            case 'SUDESTE': {
-                sub_market_value = 1.5;
+            case "SUDESTE": {
+                valor_sub_mercado = 1.5;
                 break;
             }
         }
 
-        font_value = font == 'CONVENCIONAL' ? 5 : -2;
-
-        total_value =
-            total_consume * this.kw_value + (sub_market_value + font_value);
-
-        return total_value;
+        valor_fonte = fonte.toUpperCase() == 'CONVENCIONAL' ? 5 : -2;
+        valor_total = consumo_total * 10 + (valor_sub_mercado + valor_fonte);
+        return valor_total;
     }
 }

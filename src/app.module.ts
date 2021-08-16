@@ -16,8 +16,8 @@ import { AuthModule } from './auth/auth.module';
             // autoLoadEntities: true,
             // synchronize: true,
         }),
-        PropostaModule,
-        AuthModule
+        AuthModule,
+        PropostaModule
     ],
     controllers: [],
     providers: [],
