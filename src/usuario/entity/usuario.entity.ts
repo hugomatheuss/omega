@@ -1,6 +1,6 @@
 import { Proposta } from 'src/proposta/entity/proposta.entity';
 import { BasicEntity } from 'src/shared/basic-entity';
-import { IsEmail, IsNotEmpty, MinLength } from "class-validator";
+import { IsEmail, IsNotEmpty, MinLength, IsString } from "class-validator";
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, Generated } from 'typeorm';
 
 @Entity('usuarios')
@@ -13,18 +13,25 @@ export class Usuario extends BasicEntity {
   public id_public: string;
 
   @Column()
-  @MinLength(3)
-  @IsNotEmpty({ message: "o nome do usuário é obrigatório" })
+  @MinLength(3, {
+    message: 'O nome deve ter no mínimo 3 caracteres',
+  })
+  @IsString()
+  @IsNotEmpty({ message: 'O nome do usuário é obrigatório' })
   public nome: string;
 
   @Column({ unique: true })
   @IsEmail({}, { message: 'Email incorreto' })
-  @IsNotEmpty({ message: "o email do usuário é obrigatório" })
+  @IsString()
+  @IsNotEmpty({ message: 'O email do usuário é obrigatório' })
   public email: string;
 
   @Column()
-  @MinLength(8)
-  @IsNotEmpty({ message: "a senha do usuário é obrigatória" })
+  @MinLength(8, {
+    message: 'A senha deve ter no mínimo 8 caracteres'
+  })
+  @IsString()
+  @IsNotEmpty({ message: 'A senha do usuário é obrigatória' })
   public password: string;
 
   @OneToMany(() => Proposta, (proposta) => proposta.usuario)
