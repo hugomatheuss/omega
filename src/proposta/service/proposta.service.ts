@@ -19,7 +19,7 @@ export class PropostaService {
     ) {}
 
     async create(dto: CreatePropostaDto) {
-        const consumoTotal = this.cargaService.consumoTotal(dto.carga);
+        const consumoTotal = this.cargaService.consumoTotal(dto.cargas);
 
         const valorTotal = this.calculate(
             dto.fonte_energia,
@@ -27,7 +27,7 @@ export class PropostaService {
             consumoTotal,
         );
 
-        const cargas = await this.cargaService.create(dto.carga);
+        const cargas = await this.cargaService.create(dto.cargas);
 
         const proposta = new Proposta(
             dto.data_inicio,

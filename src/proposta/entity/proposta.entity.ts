@@ -5,7 +5,6 @@ import {
     Column,
     OneToMany,
     JoinTable,
-    PrimaryGeneratedColumn,
     PrimaryColumn,
     Generated,
     ManyToOne,
@@ -28,13 +27,11 @@ export class Proposta extends BasicEntity {
     @Column({ type: 'date' })
     @IsNotEmpty({ message: "Data inicial é obrigatória" })
     @IsDate()
-    @ApiProperty({ description: 'Data de criação da proposta', type: () => Date })
     public data_inicio: Date;
 
     @Column({ type: 'date' })
     @IsNotEmpty({ message: "Data final é obrigatória" })
     @IsDate()
-    @ApiProperty({ description: 'Data do fim da proposta', type: () => Date })
     public data_fim: Date;
     
     @Column({ type: 'boolean', default: false })
@@ -44,13 +41,11 @@ export class Proposta extends BasicEntity {
     @Column({ type: 'varchar', length: 12 })
     @IsNotEmpty({ message: "Fonte de energia é obrigatório" })
     @IsString()
-    @ApiProperty({ description: 'Tipos de fontes de energia', type: () => String })
     public fonte_energia: string;
 
     @Column({ type: 'varchar', length: 8 })
     @IsNotEmpty({ message: "Submercado é obrigatório" })
     @IsString()
-    @ApiProperty({ description: 'Divisões de submercados de energia', type: () => String })
     public sub_mercado: string;
     
     @Column({ type: 'numeric' })
@@ -66,7 +61,6 @@ export class Proposta extends BasicEntity {
         onDelete: 'CASCADE',
     })
     @JoinTable({})
-    @ApiProperty({ description: 'Cargas vinculadas à proposta', type: () => Array })
     @IsNotEmpty({ message: "Você deve adicionar pelo menos uma carga" })
     @IsArray()
     carga: Carga[];

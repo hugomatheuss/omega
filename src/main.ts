@@ -11,7 +11,7 @@ async function bootstrap() {
             'API para elaboração de propostas para aquisição de energia',
         )
         .setVersion('1.0')
-        .addTag('Omega')
+        .addTag('usuario')
         .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api', app, document);

@@ -1,11 +1,33 @@
 import { Carga } from '../entity/carga.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdatePropostaDto {
+    @ApiProperty({ description: 'Data de criação da proposta', type: () => Date })
     public data_inicio: Date;
+
+    @ApiProperty({ description: 'Data do fim da proposta', type: () => Date })
     public data_fim: Date;
-    public fonte_energia: string;
+
+    @ApiProperty({ example: 'NORDESTE', description: 'Divisões de submercados de energia', type: () => String })
     public sub_mercado: string;
+
+    @ApiProperty({ example: 'RENOVÁVEL', description: 'Tipos de fontes de energia', type: () => String })
+    public fonte_energia: string;
+
     public valor_proposta: number;
+
+    @ApiProperty({
+        description: 'Cargas vinculadas à proposta', type: 'array',
+        items: {
+            type: 'array',
+            items: {
+                type: 'object',
+                items: {
+                    type: 'string'
+                }
+            }
+        },
+    })
     public carga: Carga[];
     constructor(
         data_inicio: Date,
