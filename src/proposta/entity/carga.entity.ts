@@ -32,7 +32,7 @@ export class Carga extends BasicEntity {
     @IsNumber()
     public consumo_kwh: number;
 
-    @ManyToOne(() => Proposta, (proposta) => proposta.carga, {
+    @ManyToOne(() => Proposta, (proposta) => proposta.cargas, {
         onDelete: 'CASCADE',
     })
     @JoinColumn({ name: 'proposta_id' })

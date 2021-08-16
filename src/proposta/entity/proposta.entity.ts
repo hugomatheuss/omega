@@ -63,7 +63,7 @@ export class Proposta extends BasicEntity {
     @JoinTable({})
     @IsNotEmpty({ message: "Você deve adicionar pelo menos uma carga" })
     @IsArray()
-    carga: Carga[];
+    cargas: Carga[];
 
     constructor(
         data_inicio: Date,
@@ -71,7 +71,7 @@ export class Proposta extends BasicEntity {
         fonte_energia: string,
         sub_mercado: string,
         valor_proposta: number,
-        carga: Carga[],
+        cargas: Carga[],
     ) {
         super()
         this.id_public = Guid.create().toString();
@@ -80,6 +80,6 @@ export class Proposta extends BasicEntity {
         this.fonte_energia = fonte_energia;
         this.sub_mercado = sub_mercado;
         this.valor_proposta = valor_proposta;
-        this.carga = carga;
+        this.cargas = cargas;
     }
 }

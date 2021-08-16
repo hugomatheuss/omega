@@ -52,7 +52,7 @@ export class PropostaService {
     }
 
     async update(id: Guid, updatePropostaDto: UpdatePropostaDto) {
-        const cargas = updatePropostaDto.carga;
+        const cargas = updatePropostaDto.cargas;
 
         await this.cargaService.update(cargas, id.toString());
 

@@ -14,6 +14,7 @@ export class UpdatePropostaDto {
     @ApiProperty({ example: 'RENOVÁVEL', description: 'Tipos de fontes de energia', type: () => String })
     public fonte_energia: string;
 
+    @ApiProperty({ example: 'R$ 115.000,00', description: 'Valor total da proposta, calculado automaticamente ao preencher os campos: submercado, fonte de energia e cargas', type: () => String })
     public valor_proposta: number;
 
     @ApiProperty({
@@ -28,20 +29,20 @@ export class UpdatePropostaDto {
             }
         },
     })
-    public carga: Carga[];
+    public cargas: Carga[];
     constructor(
         data_inicio: Date,
         data_fim: Date,
         fonte_energia: string,
         sub_mercado: string,
         valor_proposta: number,
-        carga: Carga[],
+        cargas: Carga[],
     ) {
         this.data_inicio = data_inicio;
         this.data_fim = data_fim;
         this.fonte_energia = fonte_energia;
         this.sub_mercado = sub_mercado;
         this.valor_proposta = valor_proposta;
-        this.carga = carga;
+        this.cargas = cargas;
     }
 }
