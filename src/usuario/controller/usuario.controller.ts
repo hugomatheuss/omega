@@ -23,6 +23,7 @@ import {
   ApiNoContentResponse,
   ApiUnauthorizedResponse
 } from '@nestjs/swagger';
+import { Guid } from 'guid-typescript';
 
 @ApiTags('usuario')
 @Controller('usuario')
@@ -49,15 +50,15 @@ export class UsuarioController {
   @Get(':id')
   @ApiOkResponse()
   @ApiNotFoundResponse({ description: 'Nenhum usuário encontrado com este ID' })
-  findOne(@Param('id') id: number) {
-    return this.usuarioService.findOne(id.toString());///bugzinho
+  findOne(@Param('id') id: Guid) {
+    return this.usuarioService.findOne(id);///bugzinho
   }
 
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   @ApiOkResponse()
   @ApiNotFoundResponse({ description: 'Nenhum usuário encontrado com este ID' })
-  update(@Param('id') id: number, @Body() updateUsuarioDto: UpdateUsuarioDto) {
+  update(@Param('id') id: Guid, @Body() updateUsuarioDto: UpdateUsuarioDto) {
     return this.usuarioService.update(id, updateUsuarioDto);
   }
 
@@ -65,7 +66,7 @@ export class UsuarioController {
   @Delete(':id')
   @ApiNoContentResponse()
   @ApiNotFoundResponse({ description: 'Nenhum usuário encontrado com este ID' })
-  remove(@Param('id') id: number) {
+  remove(@Param('id') id: Guid) {
     return this.usuarioService.remove(id);
   }
 

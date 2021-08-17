@@ -5,6 +5,7 @@ import { CreateUsuarioDto } from '../dto/create-usuario.dto';
 import { UpdateUsuarioDto } from '../dto/update-usuario.dto';
 import { Usuario } from '../entity/usuario.entity';
 import * as bcrypt from 'bcrypt';
+import { Guid } from 'guid-typescript';
 
 @Injectable()
 export class UsuarioService {
@@ -21,13 +22,17 @@ export class UsuarioService {
     return this.usuarioRepository.find();
   }
 
-  async findOne(email: string): Promise<Usuario> {
+  async findOne(id: Guid): Promise<Usuario> {
+    return this.usuarioRepository.findOne(id.toString());
+  }
+
+  async findByEmail(email: string): Promise<Usuario> {
     return this.usuarioRepository.findOne({ email: email });
   }
 
-  async update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
+  async update(id: Guid, updateUsuarioDto: UpdateUsuarioDto) {
     const usuario = await this.usuarioRepository.preload({
-      id: id,
+      id_public: id.toString(),
       ...updateUsuarioDto,
     });
 
@@ -37,8 +42,8 @@ export class UsuarioService {
     return this.usuarioRepository.save(usuario);
   }
 
-  async remove(id: number) {
-    const usuario = await this.usuarioRepository.findOne(id);
+  async remove(id: Guid) {
+    const usuario = await this.usuarioRepository.findOne(id.toString());
 
     if (!usuario) {
       throw new NotFoundException(`Usuario ID ${id} not found`);

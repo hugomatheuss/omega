@@ -2,6 +2,7 @@ import {
     Body,
     Delete,
     Put,
+    UseGuards,
 } from '@nestjs/common';
 import { Param } from '@nestjs/common';
 import { Controller, Get, Post } from '@nestjs/common';
@@ -13,12 +14,14 @@ import {
     ApiNoContentResponse,
 } from '@nestjs/swagger';
 import { Guid } from 'guid-typescript';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { IController } from 'src/shared/controller.interface';
 import { CreatePropostaDto } from '../dtos/create-proposta.dto';
 import { UpdatePropostaDto } from '../dtos/update-proposta.dto';
 import { Proposta } from '../entity/proposta.entity';
 import { PropostaService } from '../service/proposta.service';
 
+@UseGuards(JwtAuthGuard)
 @ApiTags('proposta')
 @Controller('proposta')
 export class PropostaController implements IController<Proposta> {

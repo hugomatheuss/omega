@@ -1,6 +1,7 @@
 import { Carga } from '../entity/carga.entity';
 import { IsNotEmpty, IsString, IsDateString, IsArray, IsIn } from "class-validator";
 import { ApiProperty } from '@nestjs/swagger';
+import { Usuario } from 'src/usuario/entity/usuario.entity';
 
 export class CreatePropostaDto {
     @IsNotEmpty({ message: "Data inicial é obrigatória" })
@@ -24,6 +25,9 @@ export class CreatePropostaDto {
     @IsIn(["RENOVÁVEL", "CONVENCIONAL"])
     @ApiProperty({ example: 'RENOVÁVEL', description: 'Tipos de fontes de energia', type: () => String })
     public fonte_energia: string;
+
+    /* @IsNotEmpty({ message: "Proposta sem usuário" })
+    public usuario: Usuario; */
 
     @IsNotEmpty({ message: "Você deve adicionar pelo menos uma carga" })
     @IsArray()

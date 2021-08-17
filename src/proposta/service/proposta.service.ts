@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Guid } from 'guid-typescript';
-import { type } from 'node:os';
-import { createQueryBuilder, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreatePropostaDto } from '../dtos/create-proposta.dto';
 import { UpdatePropostaDto } from '../dtos/update-proposta.dto';
 import { Carga } from '../entity/carga.entity';
@@ -47,8 +46,7 @@ export class PropostaService {
     }
 
     async findOne(id: Guid) {
-        const proposta = this.propostaRepository.findOne(id.toString());
-        return proposta;
+        return this.propostaRepository.findOne(id.toString());
     }
 
     async update(id: Guid, updatePropostaDto: UpdatePropostaDto) {
@@ -83,6 +81,9 @@ export class PropostaService {
 
         if (!proposta) {
             throw new NotFoundException(`proposta ID ${id} not found`);
+        }
+        if (proposta.contratado) {
+            throw new NotFoundException(`proposta ID ${id} - Você não pode excluir uma proposta contratada`);
         }
         return this.propostaRepository.delete(proposta);
     }
@@ -119,7 +120,7 @@ export class PropostaService {
         let valor_sub_mercado: number;
         let valor_fonte: number;
         let valor_total: number;
-        switch (sub_mercado) {
+        switch (sub_mercado.toUpperCase()) {
             case 'NORTE': {
                 valor_sub_mercado = 2;
                 break;
