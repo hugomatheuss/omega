@@ -33,7 +33,7 @@ export class UsuarioController {
     private authService: AuthService
   ) { }
 
-  @Post('create')
+  @Post()
   @ApiCreatedResponse({ description: 'Usuário criado com sucesso' })
   async create(@Body() createUsuarioDto: CreateUsuarioDto) {
     return this.usuarioService.create(createUsuarioDto);

@@ -15,14 +15,7 @@ export class UsuarioService {
   ) { }
 
   create(createUsuarioDto: CreateUsuarioDto) {
-    // crio o objeto com base no dto
-    let usuario = new Usuario()
-    usuario.email = createUsuarioDto.email
-    usuario.nome = createUsuarioDto.name
-    //criptografando a senha
-    usuario.password = bcrypt.hashSync(createUsuarioDto.password, 8);
-    // salvo o objeto criado
-    return this.usuarioRepository.save(usuario);
+    return this.usuarioRepository.save(new Usuario(createUsuarioDto.email, bcrypt.hashSync(createUsuarioDto.password, 8)));
   }
 
   findAll() {

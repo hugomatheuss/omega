@@ -1,14 +1,11 @@
 import { Proposta } from 'src/proposta/entity/proposta.entity';
 import { BasicEntity } from 'src/shared/basic-entity';
+import { Guid } from 'guid-typescript';
 import { IsEmail, IsNotEmpty, MinLength, IsString } from "class-validator";
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, Generated } from 'typeorm';
 
 @Entity('usuarios')
 export class Usuario extends BasicEntity {
-/*   @Column({ type: 'int' })
-  @Generated('increment')
-  id: number; */
-
   @Column("uuid")
   public id_public: string;
 
@@ -36,4 +33,14 @@ export class Usuario extends BasicEntity {
 
   @OneToMany(() => Proposta, (proposta) => proposta.usuario)
   public propostas: Proposta[];
+
+  constructor(
+    email: string,
+    password: string
+) {
+    super()
+    this.id_public = Guid.create().toString();
+    this.email = email;
+    this.password = password;
+}
 }

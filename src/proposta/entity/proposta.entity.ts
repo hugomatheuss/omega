@@ -17,10 +17,6 @@ import { Usuario } from 'src/usuario/entity/usuario.entity';
 
 @Entity({ name: 'propostas' })
 export class Proposta extends BasicEntity {
- /*    @PrimaryColumn({ type: 'int' })
-    @Generated('increment')
-    id: number; */
-
     @Column("uuid")
     public id_public: string;
 
