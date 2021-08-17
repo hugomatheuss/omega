@@ -1,5 +1,5 @@
-import { Guid } from "guid-typescript";
-import { BasicEntity } from "./basic-entity";
+import { Guid } from 'guid-typescript';
+import { BasicEntity } from './basic-entity';
 
 export interface IController<TEntity extends BasicEntity> {
   add(dto: any): Promise<TEntity>

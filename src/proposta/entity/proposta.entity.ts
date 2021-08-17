@@ -5,48 +5,30 @@ import {
     Column,
     OneToMany,
     JoinTable,
-    PrimaryColumn,
-    Generated,
     ManyToOne,
 } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsDate, IsArray, IsBoolean, IsNumber } from "class-validator";
 import { Carga } from './carga.entity';
 import { BasicEntity } from 'src/shared/basic-entity';
 import { Usuario } from 'src/usuario/entity/usuario.entity';
 
 @Entity({ name: 'propostas' })
 export class Proposta extends BasicEntity {
-    @Column("uuid")
-    public id_public: string;
-
     @Column({ type: 'date' })
-    @IsNotEmpty({ message: "Data inicial é obrigatória" })
-    @IsDate()
     public data_inicio: Date;
 
     @Column({ type: 'date' })
-    @IsNotEmpty({ message: "Data final é obrigatória" })
-    @IsDate()
     public data_fim: Date;
-    
+
     @Column({ type: 'boolean', default: false })
-    @IsBoolean()
     public contratado: boolean;
     
     @Column({ type: 'varchar', length: 12 })
-    @IsNotEmpty({ message: "Fonte de energia é obrigatório" })
-    @IsString()
     public fonte_energia: string;
 
     @Column({ type: 'varchar', length: 8 })
-    @IsNotEmpty({ message: "Submercado é obrigatório" })
-    @IsString()
     public sub_mercado: string;
     
     @Column({ type: 'numeric' })
-    @IsNotEmpty()
-    @IsNumber()
     public valor_proposta: number;
 
     @ManyToOne(() => Usuario, (usuario) => usuario.propostas)
@@ -57,8 +39,6 @@ export class Proposta extends BasicEntity {
         onDelete: 'CASCADE',
     })
     @JoinTable({})
-    @IsNotEmpty({ message: "Você deve adicionar pelo menos uma carga" })
-    @IsArray()
     cargas: Carga[];
 
     constructor(
@@ -70,7 +50,6 @@ export class Proposta extends BasicEntity {
         cargas: Carga[],
     ) {
         super()
-        this.id_public = Guid.create().toString();
         this.data_inicio = data_inicio;
         this.data_fim = data_fim;
         this.fonte_energia = fonte_energia;

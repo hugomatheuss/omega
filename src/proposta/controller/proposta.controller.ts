@@ -54,7 +54,7 @@ export class PropostaController implements IController<Proposta> {
     @Delete(':id')
     @ApiNoContentResponse()
     @ApiNotFoundResponse({ description: 'Nenhuma proposta encontrada com este ID' })
-    remove(@Param('id') id: Guid): Promise<Proposta> {
+    remove(@Param('id') id: Guid): Promise<any> {
         return this.service.remove(id);
     }
 }

@@ -3,7 +3,7 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  Put,
   Param,
   Delete,
   Request,
@@ -13,7 +13,6 @@ import { UsuarioService } from '../service/usuario.service';
 import { CreateUsuarioDto } from '../dto/create-usuario.dto';
 import { UpdateUsuarioDto } from '../dto/update-usuario.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { Guid } from 'guid-typescript'
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import {
@@ -50,15 +49,15 @@ export class UsuarioController {
   @Get(':id')
   @ApiOkResponse()
   @ApiNotFoundResponse({ description: 'Nenhum usuário encontrado com este ID' })
-  findOne(@Param('id') id: Guid) {
+  findOne(@Param('id') id: number) {
     return this.usuarioService.findOne(id.toString());///bugzinho
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
+  @Put(':id')
   @ApiOkResponse()
   @ApiNotFoundResponse({ description: 'Nenhum usuário encontrado com este ID' })
-  update(@Param('id') id: Guid, @Body() updateUsuarioDto: UpdateUsuarioDto) {
+  update(@Param('id') id: number, @Body() updateUsuarioDto: UpdateUsuarioDto) {
     return this.usuarioService.update(id, updateUsuarioDto);
   }
 
@@ -66,7 +65,7 @@ export class UsuarioController {
   @Delete(':id')
   @ApiNoContentResponse()
   @ApiNotFoundResponse({ description: 'Nenhum usuário encontrado com este ID' })
-  remove(@Param('id') id: Guid) {
+  remove(@Param('id') id: number) {
     return this.usuarioService.remove(id);
   }
 

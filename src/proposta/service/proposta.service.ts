@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Guid } from 'guid-typescript';
-import { Repository } from 'typeorm';
+import { type } from 'node:os';
+import { createQueryBuilder, Repository } from 'typeorm';
 import { CreatePropostaDto } from '../dtos/create-proposta.dto';
 import { UpdatePropostaDto } from '../dtos/update-proposta.dto';
 import { Carga } from '../entity/carga.entity';
@@ -37,8 +38,8 @@ export class PropostaService {
             valorTotal,
             cargas,
         );
-        // salvo o objeto criado 
-        return this.propostaRepository.save(proposta)
+        // salvo o objeto criado
+        return this.propostaRepository.save(proposta);
     }
 
     findAll(): Promise<Proposta[]> {
@@ -47,24 +48,23 @@ export class PropostaService {
 
     async findOne(id: Guid) {
         const proposta = this.propostaRepository.findOne(id.toString());
-
         return proposta;
     }
 
     async update(id: Guid, updatePropostaDto: UpdatePropostaDto) {
         const cargas = updatePropostaDto.cargas;
 
-        await this.cargaService.update(cargas, id.toString());
+        await this.cargaService.update(cargas);
 
         const consumoTotal = this.cargaService.consumoTotal(cargas);
 
-        const valorTotal = this.calculate(
+        const valotTotal = this.calculate(
             updatePropostaDto.fonte_energia,
             updatePropostaDto.sub_mercado,
             consumoTotal,
         );
 
-        updatePropostaDto.valor_proposta = valorTotal;
+        updatePropostaDto.valor_proposta = valotTotal;
 
         const proposta = await this.propostaRepository.preload({
             id_public: id.toString(),
@@ -78,7 +78,7 @@ export class PropostaService {
         return this.propostaRepository.save(proposta);
     }
 
-    async remove(id: Guid): Promise<any> {
+    async remove(id: Guid) {
         const proposta = await this.propostaRepository.findOne(id.toString());
 
         if (!proposta) {
@@ -86,10 +86,10 @@ export class PropostaService {
         }
         return this.propostaRepository.delete(proposta);
     }
-
     async removeCarga(idProposta: Guid, idCarga: Guid) {
         const cargas = await this.cargaService.remove(idProposta, idCarga);
         const consumoTotal = await this.cargaService.consumoTotal(cargas);
+        console.log(consumoTotal);
         let oldProposta = await this.propostaRepository.findOne(
             idProposta.toString(),
         );
@@ -102,6 +102,7 @@ export class PropostaService {
         const newProposta = new UpdatePropostaDto(
             oldProposta.data_inicio,
             oldProposta.data_fim,
+            oldProposta.contratado,
             oldProposta.fonte_energia,
             oldProposta.sub_mercado,
             valorTotal,
@@ -111,28 +112,27 @@ export class PropostaService {
             id_public: idProposta.toString(),
             ...newProposta,
         });
-        this.propostaRepository.save(proposta);
+        return this.propostaRepository.save(proposta);
     }
 
     calculate(fonte: string, sub_mercado: string, consumo_total: number) {
         let valor_sub_mercado: number;
         let valor_fonte: number;
         let valor_total: number;
-
-        switch (sub_mercado.toUpperCase()) {
-            case "NORTE": {
+        switch (sub_mercado) {
+            case 'NORTE': {
                 valor_sub_mercado = 2;
                 break;
             }
-            case "NORDESTE": {
+            case 'NORDESTE': {
                 valor_sub_mercado = -1;
                 break;
             }
-            case "SUL": {
+            case 'SUL': {
                 valor_sub_mercado = 3.5;
                 break;
             }
-            case "SUDESTE": {
+            case 'SUDESTE': {
                 valor_sub_mercado = 1.5;
                 break;
             }

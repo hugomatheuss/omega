@@ -1,29 +1,35 @@
 import { Carga } from '../entity/carga.entity';
+import { IsNotEmpty, IsString, IsDateString, IsArray, IsIn } from "class-validator";
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePropostaDto {
-    @ApiProperty({ example: '16/07/2021', description: 'Data de criação da proposta', type: () => Date })
+    @IsNotEmpty({ message: "Data inicial é obrigatória" })
+    @IsDateString()
+    @ApiProperty({ example: '2021-07-16', description: 'Data de criação da proposta', type: () => Date })
     public data_inicio: Date;
 
-    @ApiProperty({ example: '22/04/2025', description: 'Data do fim da proposta', type: () => Date })
+    @IsNotEmpty({ message: "Data final é obrigatória" })
+    @IsDateString()
+    @ApiProperty({ example: '2025-04-22', description: 'Data do fim da proposta', type: () => Date })
     public data_fim: Date;
-    
+
+    @IsNotEmpty({ message: "Submercado é obrigatório" })
+    @IsString({ message: "Tem certeza que digitou o submercado corretamente?" })
+    @IsIn(["NORTE", "NORDESTE", "SUL", "SUDESTE"])
     @ApiProperty({ example: 'NORDESTE', description: 'Divisões de submercados de energia', type: () => String })
     public sub_mercado: string;
 
+    @IsNotEmpty({ message: "Fonte de energia é obrigatório" })
+    @IsString({ message: "Tem certeza que digitou o submercado corretamente?" })
+    @IsIn(["RENOVÁVEL", "CONVENCIONAL"])
     @ApiProperty({ example: 'RENOVÁVEL', description: 'Tipos de fontes de energia', type: () => String })
     public fonte_energia: string;
 
+    @IsNotEmpty({ message: "Você deve adicionar pelo menos uma carga" })
+    @IsArray()
     @ApiProperty({
-        description: 'Cargas vinculadas à proposta', type: 'array',
-        items: {
-            type: 'array',
-            items: {
-                type: 'object',
-                items: {
-                    type: 'string'
-                }
-            }
-        }, })
+        description: 'Cargas vinculadas à proposta',
+        type: () => Object,
+    })
     public cargas: Carga[];
 }
