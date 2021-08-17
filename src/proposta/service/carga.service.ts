@@ -4,7 +4,6 @@ import { Guid } from 'guid-typescript';
 import { Repository } from 'typeorm';
 import { UpdateCargaDto } from '../dtos/create-carga.dto';
 import { Carga } from '../entity/carga.entity';
-import { Proposta } from '../entity/proposta.entity';
 
 @Injectable()
 export class CargaSevice {
@@ -15,12 +14,12 @@ export class CargaSevice {
 
     async create(carga: Carga[]) {
         const cargas = carga.map((c) => {
-            return new Carga(c.nome, c.consumo);
+            return new Carga(c.nome_empresa, c.consumo_kwh);
         });
         await this.cargaRepository.save(cargas);
         return cargas;
     }
-    async update(carga: Carga[], id_proposta: string) {
+    async update(carga: Carga[]) {
         const cargas = carga.map((c) => {
             this.cargaRepository.update(c.id_public, c);
         });
@@ -34,19 +33,21 @@ export class CargaSevice {
             throw new NotFoundException(`carga ID ${idCarga} not found`);
         }
         await this.cargaRepository.remove(carga);
+
         const cargas = await this.cargaRepository.find({
             where: { proposta: idProposta },
         });
+        console.log(cargas);
         return cargas;
     }
-    findAll() {}
-    findOne() {}
-    consumoTotal(carga: Carga[]) {
-        const consumoTotal = carga
-            .map((carga) => carga.consumo)
+    consumoTotal(cargas: Carga[]) {
+        const consumoTotal = cargas
+            .map((cargas) => cargas.consumo_kwh)
             .reduce((p, c) => {
                 return +p + +c;
             });
         return consumoTotal;
     }
+    findAll() {}
+    findOne() {}
 }

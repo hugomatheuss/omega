@@ -5,7 +5,6 @@ import { type } from 'node:os';
 import { createQueryBuilder, Repository } from 'typeorm';
 import { CreatePropostaDto } from '../dtos/create-proposta.dto';
 import { UpdatePropostaDto } from '../dtos/update-proposta.dto';
-import { Carga } from '../entity/carga.entity';
 import { Proposta } from '../entity/proposta.entity';
 import { CargaSevice } from './carga.service';
 
@@ -15,12 +14,10 @@ export class PropostaService {
         private readonly cargaService: CargaSevice,
         @InjectRepository(Proposta)
         private readonly propostaRepository: Repository<Proposta>,
-        @InjectRepository(Carga)
-        private readonly cargaRepository: Repository<Carga>,
     ) {}
 
     async create(dto: CreatePropostaDto) {
-        const consumoTotal = this.cargaService.consumoTotal(dto.carga);
+        const consumoTotal = this.cargaService.consumoTotal(dto.cargas);
 
         const valorTotal = this.calculate(
             dto.fonte_energia,
@@ -28,7 +25,7 @@ export class PropostaService {
             consumoTotal,
         );
 
-        const cargas = await this.cargaService.create(dto.carga);
+        const cargas = await this.cargaService.create(dto.cargas);
 
         const proposta = new Proposta(
             dto.data_inicio,
@@ -48,14 +45,13 @@ export class PropostaService {
 
     async findOne(id: Guid) {
         const proposta = this.propostaRepository.findOne(id.toString());
-
         return proposta;
     }
 
     async update(id: Guid, updatePropostaDto: UpdatePropostaDto) {
         const cargas = updatePropostaDto.carga;
 
-        await this.cargaService.update(cargas, id.toString());
+        await this.cargaService.update(cargas);
 
         const consumoTotal = this.cargaService.consumoTotal(cargas);
 
@@ -89,6 +85,7 @@ export class PropostaService {
     async removeCarga(idProposta: Guid, idCarga: Guid) {
         const cargas = await this.cargaService.remove(idProposta, idCarga);
         const consumoTotal = await this.cargaService.consumoTotal(cargas);
+        console.log(consumoTotal);
         let oldProposta = await this.propostaRepository.findOne(
             idProposta.toString(),
         );
@@ -110,14 +107,13 @@ export class PropostaService {
             id_public: idProposta.toString(),
             ...newProposta,
         });
-        this.propostaRepository.save(proposta);
+        return this.propostaRepository.save(proposta);
     }
 
     calculate(font: string, sub_market: string, total_consume: number) {
         let sub_market_value: number;
         let font_value: number;
         let total_value: number;
-        console.log(sub_market);
         switch (sub_market) {
             case 'NORTE': {
                 sub_market_value = 2;
@@ -138,10 +134,9 @@ export class PropostaService {
         }
 
         font_value = font == 'CONVENCIONAL' ? 5 : -2;
-        console.log(total_consume, sub_market_value, font_value);
 
         total_value = total_consume * 10 + (sub_market_value + font_value);
-        console.log(total_value);
+
         return total_value;
     }
 }

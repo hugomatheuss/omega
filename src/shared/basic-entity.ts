@@ -1,12 +1,13 @@
 import { Guid } from 'guid-typescript';
-import { PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Generated, PrimaryColumn } from 'typeorm';
 
 export abstract class BasicEntity {
-    @PrimaryGeneratedColumn({ type: 'numeric' })
-    public id: number;
-
-    @Column({ type: 'varchar' })
+    @PrimaryColumn({ type: 'varchar' })
     public id_public: string;
+
+    @Column({ type: 'int' })
+    @Generated('increment')
+    public id: number;
 
     @CreateDateColumn({
         type: 'timestamptz',
