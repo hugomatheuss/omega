@@ -44,6 +44,9 @@ $ npm run start:dev
 # production mode
 $ npm run start:prod
 ```
+## Swagger API
+
+> [Full API Spec](http://localhost:3000/api/)
 
 ## License
 
