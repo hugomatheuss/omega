@@ -10,5 +10,11 @@
     "synchronize": true,
     "cli": {
         "migrationsDir": "database/migrations"
+    },
+    "ssl": true,
+    "extra": {
+        "ssl": {
+        "rejectUnauthorized": false
+        }
     }
 }
