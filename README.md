@@ -43,6 +43,24 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod
+
+## Routes
+
+- GET `/usuario/` - Todos os usuários
+- GET `/usuario/{id}` - Um usuário específico
+- POST `/usuario/create` - Cadastra um usuário
+- POST `/usuario/login` - Login do usuário
+- PUT `/usuario/{id}` - Edita um usuário específico
+- DELETE `/usuario/{id}` - Remove uma proposta específica
+
+- GET `/proposta` - Todas as propostas do usuário
+- GET `/proposta/{id}` - Uma proposta específica do usuário
+- POST `/proposta` - Cadastra uma proposta
+- PUT `/proposta/{id}` - Contrata uma proposta específica
+- DELETE `/proposta/{id}` - Remove uma proposta específica
+
+- GET `/carga` - Todas as cargas
+- POST `/carga` - Cadastra uma carga
 ```
 ## Swagger API
 
