@@ -43,7 +43,7 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod
-
+```
 ## Routes
 
 - GET `/usuario/` - Todos os usuários
@@ -61,7 +61,7 @@ $ npm run start:prod
 
 - GET `/carga` - Todas as cargas
 - POST `/carga` - Cadastra uma carga
-```
+
 ## Swagger API
 
 > [Full API Spec](https://app-omega.herokuapp.com/api/#/)
