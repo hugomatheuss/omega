@@ -46,7 +46,7 @@ $ npm run start:prod
 ```
 ## Swagger API
 
-> [Full API Spec](http://localhost:3000/api/)
+> [Full API Spec](https://app-omega.herokuapp.com/api/#/)
 
 ## License
 
